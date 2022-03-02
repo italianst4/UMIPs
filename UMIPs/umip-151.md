@@ -11,7 +11,7 @@
 The Volatility DAOracle is a collection of methodologies and implementations for indices and benchmarks. Each index can be verified by decentralized users through its data endpoint, open-source code, and methodology paper. This information can be looked up through the `requestAndProposePriceFor` call to the [SkinnyOO](https://docs-git-doc-updates-uma.vercel.app/contracts/oracle/implementation/SkinnyOptimisticOracle#parameters-4) where the following parameters can be used to query any of the indices in the Volatility DAOracle:
 
 * `identifier`: price identifier to identify the existing request.
-* `timestamp`: timestamp to identify the existing request.
+* `timestamp`: timestamp of the data to identify the existing request.
 * `ancillaryData`: ancillary data of the price being requested.
 
 ## Motivation
@@ -41,8 +41,7 @@ Each PIP contains information on how to access raw data. In general there are tw
 * One based on the IPFS hash.
 2. In cases where the IPFS data is completely lost or broken, the PIP directory of the methodology will outline alternate ways of accessing the data in the README.md (e.g. it may list the exchanges or other third-party data provider from which the data originated and any special processing needed for aggregating the feed(s) for input to the open-source implementation).
 
-As part of the PIP process The Volatility DAO sets a parameter called `dataPeriod`. This represents the time period at which snapshots of input data & index values are saved to IPFS. Only the most recent snapshot can be relayed to The Volatility Oracle for audit and it can only be audited once, subsequent submissions of the same snapshot to The Volatility Oracle are denied by our smart contracts. DVM participants should also deny repeat submissions of the same snapshot. While the Skinny Optimistic Oracle already enforces unique combinations of msg.sender, identifier, timestamp, ancillaryData by requiring that such combination has never been requested, there is still the potential for repeat submissions to be sent to the DVM. Specifially, timestamp can change but still represent the snapshot. To ensure that repeat submissions do not happen, DVM participants will need to round down the timestamp to the last `dataPeriod` (See **Implementation** below for how to round). `dataPeriod` can be set to any time resolution (e.g. 1 second or 1 hour) but should never be greater than the desired amount of time between audits.
-
+As part of the PIP process The Volatility DAO sets a parameter called `dataPeriod`. This represents the time period at which snapshots of input data & index values are saved to IPFS. `dataPeriod` can be set to any time resolution (e.g. 1 second or 1 hour) but should never be greater than the desired amount of time between audits. Only the most recent snapshot can be relayed to The Volatility Oracle for audit and it can only be audited once, subsequent submissions of the same snapshot to The Volatility Oracle are denied by our smart contracts. Given the Skinny Optimistic Oracle already enforces unique combinations of msg.sender, identifier, timestamp, and ancillaryData by requiring that such combination has never been requested, there should never be duplicate submissions in the DVM. 
 
 
 ## Rationale
